@@ -1,0 +1,148 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Nothing to install"
+      - echo "This project is a static website"
+  build:
+    commands:
+      - echo "Preparing static website files"
+artifacts:
+  files:
+    - '**/*'
+  base-directory: 'src/main/webapp'
+
+
+#  CodeBuild will:
+#  Clone your GitHub repository.
+#  Execute install phase.
+#  Execute build phase.
+#  Take everything inside: src/main/webapp
+#  and package it as the build artifact:
+#  - css/
+#  - js/
+#  - images/
+
+
+# verify : tree src/main/webapp
+# commands: tree src/main/webapp
+# expected output:
+# css/
+# js/
+# images/
+# index.html
+
+
+
+#  *   = anything
+#  /   = folder separator
+#  **  = any number of folders
+
+# Let's use this directory:
+#  project/
+#  ├── index.html
+#  ├── style.css
+#  ├── css/
+#  │   └── main.css
+#  ├── js/
+#  │   └── app.js
+#  └── images/
+#      └── logo.png
+
+
+
+# *      → Matches everything in the current directory only.
+
+# Example: =>
+# index.html
+# style.css
+# css
+# js
+# images
+
+
+# /*     → Matches files and folders one level below the root directory. One level below the root
+# think root/*
+
+# Example:
+# /index.html
+# /style.css
+# /css
+# /js
+# /images
+
+
+# **     → Matches directories recursively (all levels). Any number of directories
+
+# css
+#js
+#images
+
+# and if the project structure would be
+#  project/
+#  ├── css/
+#  │   ├── main.css
+#  │   └── theme/
+#  │       └── dark/
+#  │           └── dark.css
+#  │
+#  └── js/
+#    └── lib/
+#      └── common/
+#        └── util.js
+
+# Then:
+# Example:
+# css
+# css/theme
+# css/theme/dark
+# js
+# js/lib
+# js/lib/common
+
+
+# **   = recursive directory matcher
+# **/  = recursive directory path ending with /
+
+
+# **/    → Matches all directories recursively.
+# (Folders only, not files)
+
+# Example:
+# css/
+# js/
+# images/
+
+
+#  **
+#  **/
+# are practically showing the same folders:
+
+# css
+# js
+# images
+
+# vs
+
+# css/
+# js/
+# images/
+
+# The trailing / simply indicates "directory".
+# Same directories, but with the slash indicating they're folders.
+
+# **/*   → Matches ALL files in ALL folders recursively.
+
+# Example:
+# index.html
+# css/style.css
+# js/app.js
+# images/logo.png
+
+# *.html     → All HTML files in current directory.
+# *.css      → All CSS files in current directory.
+
+# **/*.html  → All HTML files recursively.
+# **/*.css   → All CSS files recursively.
+# **/*.js    → All JavaScript files recursively.

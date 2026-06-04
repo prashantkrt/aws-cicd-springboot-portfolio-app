@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Prashant Kumar Tiwary | Java Backend Developer</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+
+            background: radial-gradient(circle at 10% 20%, rgba(0, 191, 255, .18), transparent 25%),
+            radial-gradient(circle at 90% 80%, rgba(138, 43, 226, .20), transparent 25%),
+            radial-gradient(circle at 50% 50%, rgba(0, 255, 200, .10), transparent 35%),
+            linear-gradient(135deg, #020617, #0f172a, #111827, #020617);
+        }
+
+        /* Floating glow */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: #00bfff;
+            filter: blur(180px);
+            opacity: .12;
+            top: -150px;
+            left: -150px;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: #8a2be2;
+            filter: blur(180px);
+            opacity: .15;
+            bottom: -150px;
+            right: -150px;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* Hero Section */
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-card {
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 24px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 20px;
+
+            background: linear-gradient(
+                    90deg,
+                    #00c6ff,
+                    #7f5af0,
+                    #00e5ff
+            );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h2 {
+            color: #d1d5db;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .hero p {
+            max-width: 800px;
+            margin: auto;
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        .btn-container {
+            margin-top: 35px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            margin: 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: .3s;
+        }
+
+        .primary {
+            background: linear-gradient(90deg, #00c6ff, #7f5af0);
+            color: white;
+        }
+
+        .secondary {
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Sections */
+
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: #00e5ff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 20px;
+            padding: 30px;
+            transition: .3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 191, 255, .15);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: #00e5ff;
+        }
+
+        .card p {
+            color: #d1d5db;
+            line-height: 1.7;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .skill {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            padding: 12px 20px;
+            border-radius: 50px;
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        footer a {
+            color: #00e5ff;
+            text-decoration: none;
+        }
+
+        footer p {
+            margin: 10px;
+        }
+
+        @media (max-width: 768px) {
+
+            .hero-card {
+                padding: 30px;
+            }
+
+            .hero h1 {
+                font-size: 2.6rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<section class="hero">
+    <div class="hero-card">
+
+        <h1>Prashant Kumar Tiwary</h1>
+
+        <h2>
+            Software Engineer • Java Backend Developer • AWS Enthusiast
+        </h2>
+
+        <p>
+            Experienced Backend Developer with 5.5+ years of expertise
+            in Java, Spring Boot, Microservices, Kafka, PostgreSQL,
+            MongoDB, Docker, Kubernetes and AWS.
+
+            Passionate about building scalable cloud-native applications,
+            event-driven systems, high-performance APIs and modern DevOps
+            solutions.
+        </p>
+
+        <div class="btn-container">
+
+            <a href="https://github.com/prashantkrt"
+               target="_blank"
+               class="btn primary">
+                View GitHub
+            </a>
+
+            <a href="#contact"
+               class="btn secondary">
+                Contact Me
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+<section>
+    <div class="container">
+
+        <h2 class="section-title">Technical Skills</h2>
+
+        <div class="skills">
+
+            <span class="skill">Java</span>
+            <span class="skill">Spring Boot</span>
+            <span class="skill">Spring Security</span>
+            <span class="skill">Microservices</span>
+            <span class="skill">Kafka</span>
+            <span class="skill">AWS</span>
+            <span class="skill">Docker</span>
+            <span class="skill">Kubernetes</span>
+            <span class="skill">PostgreSQL</span>
+            <span class="skill">MongoDB</span>
+            <span class="skill">Redis</span>
+            <span class="skill">Jenkins</span>
+            <span class="skill">GitHub Actions</span>
+            <span class="skill">CI/CD</span>
+
+        </div>
+
+    </div>
+</section>
+
+<section>
+
+    <div class="container">
+
+        <h2 class="section-title">Professional Experience</h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>Backend Engineering</h3>
+                <p>
+                    Designing scalable backend services using
+                    Java, Spring Boot and Microservices architecture.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Cloud & DevOps</h3>
+                <p>
+                    Hands-on experience with AWS, Docker,
+                    Kubernetes, CI/CD pipelines and automation.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Event Driven Systems</h3>
+                <p>
+                    Building reliable distributed applications
+                    using Apache Kafka and asynchronous messaging.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section>
+
+    <div class="container">
+
+        <h2 class="section-title">Highlighted Projects</h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>Supply Chain Platform</h3>
+                <p>
+                    Enterprise-grade microservices platform built
+                    using Spring Boot, Kafka and AWS.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Reactive Product Aggregator</h3>
+                <p>
+                    WebFlux-based aggregator service with
+                    scalable API orchestration.
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>AWS Cloud Deployments</h3>
+                <p>
+                    ECS, ECR, Lambda, Elastic Beanstalk,
+                    CloudFormation and CI/CD implementations.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="contact">
+
+    <div class="container">
+
+        <h2 class="section-title">Contact</h2>
+
+        <div class="card">
+
+            <p>
+                📧 Email:
+                prashanttiwary10@gmail.com
+            </p>
+
+            <p>
+                💻 GitHub:
+                https://github.com/prashantkrt
+            </p>
+
+            <p>
+                🚀 Open to exciting opportunities involving
+                Java, Spring Boot, AWS, Microservices,
+                Cloud Engineering and System Design.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <p>
+        © 2026 Prashant Kumar Tiwary
+    </p>
+
+    <p>
+        Built with HTML, CSS & Passion for Software Engineering
+    </p>
+
+</footer>
+
+</body>
+</html>
+
