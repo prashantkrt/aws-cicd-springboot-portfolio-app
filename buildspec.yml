@@ -16,17 +16,60 @@ artifacts:
     - '**/*'
   base-directory: 'src/main/webapp'
 
+# CodeBuild will:
+# 1. Clone your GitHub repository.
+# 2. Execute install phase.
+# 3. Execute build phase.
+# 4. Collect static website files from:
+#    src/main/webapp
+#    Examples:
+#    - index.html
+#    - css/
+#    - js/
+#    - images/
 
-#  CodeBuild will:
-#  Clone your GitHub repository.
-#  Execute install phase.
-#  Execute build phase.
-#  Take everything inside: src/main/webapp
-#  and package it as the build artifact:
-#  - css/
-#  - js/
-#  - images/
+# 5. Execute post_build phase.
+# 6. Upload website files to S3:
+#    aws s3 cp src/main/webapp/ \
+#    s3://my-portfolio-webapp-bucket/ \
+#    --recursive
 
+# 7. Files are copied to:
+
+#    my-portfolio-webapp-bucket
+#    ├── index.html
+#    ├── css/
+#    ├── js/
+#    └── images/
+
+# 8. S3 Static Website Hosting serves the files.
+# 9. Users access the website through the S3 Website Endpoint.
+
+# Final Flow:
+
+# GitHub
+#    │
+#    ▼
+# GitHub Webhook
+#    │
+#    ▼
+# AWS CodeBuild
+#    │
+#    ├── install
+#    ├── build
+#    └── post_build
+#            │
+#            ▼
+#      aws s3 cp --recursive
+#            │
+#            ▼
+# my-portfolio-webapp-bucket
+#            │
+#            ▼
+# Static Website Hosting
+#            │
+#            ▼
+# Browser
 
 # verify : tree src/main/webapp
 # commands: tree src/main/webapp

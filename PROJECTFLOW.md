@@ -7,7 +7,38 @@ This project demonstrates a simple CI/CD pipeline for deploying a static website
 * GitHub Repository
 * GitHub Webhook
 * AWS CodeBuild
-* Amazon S3 Static Website Hosting
+* Amazon S3
+* S3 Static Website Hosting
+
+Whenever code is pushed to GitHub, CodeBuild is automatically triggered through a GitHub webhook. CodeBuild then uploads the latest website files to an S3 bucket, which serves the website through S3 Static Website Hosting.
+
+---
+
+# Architecture
+
+```text
+Developer
+    │
+    ▼
+GitHub Repository
+    │
+    │ Push Code
+    ▼
+GitHub Webhook
+    │
+    ▼
+AWS CodeBuild
+    │
+    │ Build & Deploy
+    ▼
+Amazon S3 Bucket
+    │
+    ▼
+Static Website Hosting
+    │
+    ▼
+Browser
+```
 
 ---
 
@@ -26,10 +57,10 @@ phases:
     commands:
       - echo "Preparing static website files"
 
-artifacts:
-  files:
-    - '**/*'
-  base-directory: 'src/main/webapp'
+  post_build:
+    commands:
+      - echo "Uploading website files to S3"
+      - aws s3 cp src/main/webapp/ s3://my-portfolio-webapp-bucket/ --recursive
 ```
 
 ---
@@ -46,103 +77,116 @@ src/main/webapp/
 
 ---
 
-# CI/CD Flow
+# What CodeBuild Does
+
+CodeBuild will:
 
 ```text
-Developer
-    │
-    ▼
-GitHub Repository
-    │
-    │ Push Code
-    ▼
-GitHub Webhook
-    │
-    ▼
-AWS CodeBuild
-    │
-    │ Reads buildspec.yml
-    │
-    │ Collects files from:
-    │ src/main/webapp
-    ▼
-Build Artifact
-    │
-    ▼
-S3 Website Bucket
-    │
-    ▼
-Static Website Hosting
-    │
-    ▼
-Browser
+1. Clone the GitHub repository.
+
+2. Execute the install phase.
+
+3. Execute the build phase.
+
+4. Collect website files from:
+
+   src/main/webapp
+
+   Examples:
+   - index.html
+   - css/
+   - js/
+   - images/
+
+5. Execute the post_build phase.
+
+6. Upload files to S3 using:
+
+   aws s3 cp src/main/webapp/ \
+   s3://my-portfolio-webapp-bucket/ \
+   --recursive
+
+7. Store files inside:
+
+   my-portfolio-webapp-bucket
+   ├── index.html
+   ├── css/
+   ├── js/
+   └── images/
+
+8. S3 Static Website Hosting serves the files.
+
+9. Users access the website through a browser.
 ```
 
 ---
 
-# What Happens During Build?
+# Build Lifecycle
 
 ## Install Phase
 
-```text
-Nothing to install.
+```yaml
+install:
+  commands:
+    - echo "Nothing to install"
 ```
 
-This project contains only static files:
+Purpose:
 
 ```text
-HTML
-CSS
-JavaScript
-Images
+Prepare build environment.
 ```
 
-No compilation is required.
+Since this project is a static website:
 
 ```text
 No Maven
 No Gradle
 No Spring Boot Packaging
 No NodeJS Build
+No Compilation
 ```
 
 ---
 
 ## Build Phase
 
-```text
-Preparing static website files
+```yaml
+build:
+  commands:
+    - echo "Preparing static website files"
 ```
 
-CodeBuild simply prepares the static website assets.
+Purpose:
+
+```text
+Validate and prepare website files.
+```
 
 ---
 
-# Artifacts Section
+## Post Build Phase
 
 ```yaml
-artifacts:
-  files:
-    - '**/*'
-  base-directory: 'src/main/webapp'
+post_build:
+  commands:
+    - aws s3 cp src/main/webapp/ s3://my-portfolio-webapp-bucket/ --recursive
 ```
 
-Meaning:
+Purpose:
 
 ```text
-Take everything from:
-
-src/main/webapp
-
-including:
-
-index.html
-css/
-js/
-images/
+Deploy website files to S3.
 ```
 
-and package them into the build artifact.
+Example:
+
+```text
+src/main/webapp/index.html
+      │
+      ▼
+s3://my-portfolio-webapp-bucket/index.html
+```
 
 ---
 
@@ -174,24 +218,25 @@ Bucket Name:
 my-portfolio-webapp-bucket
 ```
 
-The bucket stores:
+Example contents:
 
 ```text
-index.html
-css/style.css
-js/app.js
-images/logo.png
+my-portfolio-webapp-bucket
+├── index.html
+├── css/style.css
+├── js/app.js
+└── images/logo.png
 ```
 
 ---
 
-# Why Do We Need a Bucket Policy?
+# Why Do We Need IAM Permissions?
 
-There are two different actors involved.
+There are two actors interacting with S3.
 
 ---
 
-# Actor 1: CodeBuild
+# Actor 1 - AWS CodeBuild
 
 CodeBuild uploads website files to S3.
 
@@ -207,7 +252,7 @@ Upload Files
 S3 Bucket
 ```
 
-Required permissions:
+Required Permissions:
 
 ```text
 s3:PutObject
@@ -229,7 +274,119 @@ codebuild-my-portfolio-service-role
 
 ---
 
-# Actor 2: Website Visitor
+# CodeBuild IAM Policy
+
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "s3:PutObject",
+    "s3:GetObject",
+    "s3:ListBucket"
+  ],
+  "Resource": [
+    "arn:aws:s3:::my-portfolio-webapp-bucket",
+    "arn:aws:s3:::my-portfolio-webapp-bucket/*"
+  ]
+}
+```
+
+---
+
+# Why Are There Two Resources?
+
+## Bucket ARN
+
+```text
+arn:aws:s3:::my-portfolio-webapp-bucket
+```
+
+Represents:
+
+```text
+The Bucket Itself
+```
+
+Used for:
+
+```text
+s3:ListBucket
+```
+
+Example:
+
+```text
+Show me all files inside the bucket.
+```
+
+---
+
+## Object ARN
+
+```text
+arn:aws:s3:::my-portfolio-webapp-bucket/*
+```
+
+Represents:
+
+```text
+All files inside the bucket.
+```
+
+Examples:
+
+```text
+index.html
+css/style.css
+js/app.js
+images/logo.png
+```
+
+Used for:
+
+```text
+s3:GetObject
+s3:PutObject
+s3:DeleteObject
+```
+
+---
+
+# Easy Way To Remember
+
+```text
+Bucket
+=
+arn:aws:s3:::bucket-name
+
+Objects
+=
+arn:aws:s3:::bucket-name/*
+```
+
+Examples:
+
+```text
+s3:ListBucket  → Bucket ARN
+
+s3:GetObject   → Object ARN
+
+s3:PutObject   → Object ARN
+
+s3:DeleteObject → Object ARN
+```
+
+---
+
+# Why Do We Need a Bucket Policy?
+
+CodeBuild uploads files successfully because it authenticates using an IAM Role.
+
+However, website visitors are different.
+
+---
+
+# Actor 2 - Website Visitor
 
 When someone opens the website:
 
@@ -245,7 +402,7 @@ S3 Bucket
 
 The browser is not authenticated with AWS.
 
-Without permission:
+Without a bucket policy:
 
 ```text
 Browser
@@ -257,13 +414,7 @@ S3 Bucket
 403 Access Denied
 ```
 
-Therefore we must allow:
-
-```text
-s3:GetObject
-```
-
-for public users.
+because anonymous users cannot read S3 objects.
 
 ---
 
@@ -297,7 +448,7 @@ for public users.
 Meaning:
 
 ```text
-Anyone
+Anyone on the internet.
 ```
 
 Examples:
@@ -305,6 +456,7 @@ Examples:
 ```text
 Chrome Browser
 Firefox Browser
+Edge Browser
 Mobile Browser
 Any Internet User
 ```
@@ -344,7 +496,7 @@ logo.png
 Meaning:
 
 ```text
-All objects inside the bucket
+All objects inside the bucket.
 ```
 
 Examples:
@@ -358,14 +510,20 @@ images/logo.png
 
 ---
 
-# Why Doesn't the Bucket Policy Mention CodeBuild?
+# Why Doesn't The Bucket Policy Mention CodeBuild?
 
-Because CodeBuild uses IAM Roles.
+Because CodeBuild authenticates using IAM.
 
-CodeBuild authenticates as:
+Flow:
 
 ```text
-codebuild-my-portfolio-service-role
+CodeBuild
+    │
+    ▼
+IAM Role
+    │
+    ▼
+S3
 ```
 
 AWS already knows who CodeBuild is.
@@ -373,130 +531,14 @@ AWS already knows who CodeBuild is.
 Therefore:
 
 ```text
-CodeBuild
-    ▼
-IAM Role
-    ▼
-S3
-```
-
-No public bucket access is required.
-
----
-
-# CodeBuild IAM Policy Example
-
-```json
-{
-  "Effect": "Allow",
-  "Action": [
-    "s3:PutObject",
-    "s3:GetObject",
-    "s3:ListBucket"
-  ],
-  "Resource": [
-    "arn:aws:s3:::my-portfolio-webapp-bucket",
-    "arn:aws:s3:::my-portfolio-webapp-bucket/*"
-  ]
-}
-```
-
----
-
-# Why Two Resources?
-
-## Bucket ARN
-
-```text
-arn:aws:s3:::my-portfolio-webapp-bucket
-```
-
-Represents:
-
-```text
-The Bucket Itself
-```
-
-Used for:
-
-```text
-s3:ListBucket
-```
-
-Example:
-
-```text
-Show me all files inside the bucket
-```
-
----
-
-## Object ARN
-
-```text
-arn:aws:s3:::my-portfolio-webapp-bucket/*
-```
-
-Represents:
-
-```text
-Files Inside The Bucket
-```
-
-Examples:
-
-```text
-index.html
-style.css
-app.js
-logo.png
-```
-
-Used for:
-
-```text
-s3:GetObject
-s3:PutObject
-s3:DeleteObject
-```
-
----
-
-# Easy Way To Remember
-
-```text
-Bucket
-=
-arn:aws:s3:::bucket-name
-
-Objects
-=
-arn:aws:s3:::bucket-name/*
-```
-
-Examples:
-
-```text
-ListBucket
-→ Bucket ARN
-
-GetObject
-→ Object ARN
-
-PutObject
-→ Object ARN
-
-DeleteObject
-→ Object ARN
+No public access is required for CodeBuild.
 ```
 
 ---
 
 # Permission Summary
 
-## CodeBuild
-
-Needs:
+## CodeBuild Needs
 
 ```text
 s3:PutObject
@@ -507,14 +549,12 @@ s3:ListBucket
 Purpose:
 
 ```text
-Upload and manage website files
+Upload and manage website files.
 ```
 
 ---
 
-## Browser
-
-Needs:
+## Browser Needs
 
 ```text
 s3:GetObject
@@ -523,7 +563,7 @@ s3:GetObject
 Purpose:
 
 ```text
-Download website files
+Download website files.
 ```
 
 ---
@@ -540,14 +580,40 @@ GitHub Webhook
    ▼
 AWS CodeBuild
    │
-   │ Build Artifact
+   │ Upload Files To S3
    ▼
-S3 Website Bucket
+my-portfolio-webapp-bucket
    │
    │ Public Read Access
    ▼
-Static Website Hosting
+S3 Static Website Hosting
    │
    ▼
 Users Access Website
+```
+
+---
+
+# Key Learning Outcomes
+
+```text
+GitHub Webhook
+→ Automatically triggers CodeBuild
+
+CodeBuild
+→ Builds and deploys website files
+
+IAM Role
+→ Allows CodeBuild to access S3
+
+Bucket Policy
+→ Allows browsers to access website files
+
+S3 Static Website Hosting
+→ Serves website content to users
+
+AWS CLI
+→ Deploys files using:
+
+aws s3 cp --recursive
 ```
