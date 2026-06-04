@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.mylearning</groupId>
-    <artifactId>springboot-portfolio-app</artifactId>
+    <artifactId>aws-cicd-springboot-portfolio-app</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
 
-    <name>springboot-portfolio-app</name>
+    <name>aws-cicd-springboot-portfolio-app</name>
 
     <build>
         <plugins>

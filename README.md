@@ -610,5 +610,29 @@ proxy:
   upload-artifacts: yes
   logs: yes
 ```
-
+---
+```text
+CodeBuild Starts
+       │
+       ▼
+Install Phase
+       │
+       ▼
+Pre-Build Phase
+       │
+       ▼
+Build Phase
+       │
+       ▼
+Post-Build Phase
+       │
+       ▼
+Artifacts Generated
+       │
+       ▼
+Reports Published
+       │
+       ▼
+Build Completed
+```
 
