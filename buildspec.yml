@@ -8,6 +8,9 @@ phases:
   build:
     commands:
       - echo "Preparing static website files"
+  post_build:
+    commands:
+      - aws s3 cp src/main/webapp/ s3://my-portfolio-webapp-bucket/ --recursive
 artifacts:
   files:
     - '**/*'
